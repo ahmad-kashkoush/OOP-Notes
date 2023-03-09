@@ -11,10 +11,15 @@
         2.3 Always Type word virtual If it's virtual, Don't depend on compiler  and to make code friendly to read 
    ```` 
 2. If Behavior change when data type change that's polymorphism, otherwise you can use templates
-3. When You make an interfase
+3. When You make an interface
    * Know that you must make it intuitve
    * You can't change it at all, because multiple projects are depending on it
    * You must provide so basic functions in the interface, by basic I mean the functions that guarnanteed no change in the future
-4. 
+4. In the market, it's better to depend on composition of interfaces instead of hirarcheal inheritance
+5. It's always better to decrease inheritance and increase composition
+6. If you write function of type:
+   * **non virtual**--> means don't override, use this implementaiton
+   * **virutual** --> it's ok to override or not if you want to keep using it
+   * **pure virtual**--> means you must provide an overrider for child 
   
   
