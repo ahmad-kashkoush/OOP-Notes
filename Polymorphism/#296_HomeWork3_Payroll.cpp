@@ -4,6 +4,7 @@
 #include<iostream>
 #include<vector>
 using namespace std;
+
 class Payable{
     double PayCost;
 public:
@@ -91,8 +92,32 @@ public:
     using Item::Item;
     Item *Clone()override{return new Food(*this);}
 };
+class Validatable{
+public:
+    Validatable()=default;
+    virtual Validatable *Clone()=0;
+    virtual bool Validate()=0;
+};
+class IsOutOfDate: public Validatable{
+public:
+    IsOutOfDate()=default;
+    Validatable *Clone()override{
+        return new IsOutOfDate(*this);
+    }
+    bool Validate()override{return false;}
+};
+class Taxes: public Validatable{
+public:
+    Taxes()=default;
+    Validatable *Clone()override{
+        return new Taxes(*this);
+    }
+    bool Validate()override{return true;}
+};
+
 class Invoice:public Payable{
     vector<Item *> Items;
+    vector<Validatable *> rules;
 public:
     void AddItem(Item *item){
         Items.emplace_back(item->Clone());
@@ -109,6 +134,14 @@ public:
         for(auto item:Items)
             delete item;
         Items.clear();
+    }
+    void AddRule(Validatable *rule){
+        rules.emplace_back((rule->Clone()));
+    }
+    bool Validator(){
+        for(auto rule:rules)
+            if(!rule->Validate())return false;
+        return true;
     }
 };
 class Payroll{
@@ -146,8 +179,11 @@ private:
         payroll.AddPayable(new LaborerEmployee(9, 20.5));
         payroll.AddPayable(new CommisionEmployee(10.20, 15, .15));
         payroll.AddPayable(new Volunteer);
-
-        payroll.AddPayable(k);
+        // Add Validation Rules
+        k->AddRule(new IsOutOfDate);
+        k->AddRule(new Taxes);
+        if(k->Validator())
+          payroll.AddPayable(k);
         
 
 
