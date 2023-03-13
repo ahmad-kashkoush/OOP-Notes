@@ -1,5 +1,7 @@
 #include<iostream>
 #include<vector>
+#include <sstream>
+#include "json/json.hpp"
 using namespace std;
 
 // PayPalCreditCard and PayPalOnlinePaymentAPI are NOT our code. They are Paypal API.
@@ -41,6 +43,10 @@ public:
     bool static WithDrawMoney(StripeUserInfo user,
                               StripeCardInfo card,
                               double money) {
+        return true;
+    }
+    bool static WithDrawMoney(const string &JsonQuery){
+        json::JSON obj2=json::JSON::Load(JsonQuery);
         return true;
     }
 };
@@ -87,18 +93,31 @@ private:
     StripeCardInfo card;
     StripeUserInfo usr;
     StripePaymentAPI SS;
+    json::JSON obj;
 public:
-    StripePayment()=default;
+
+    StripePayment() {
+        obj[""]= json::Object();
+    }
     void SetCardInfo(const string &id, const string &expireDate, int ccv) override{
         card.id=id;
         card.expire_date=expireDate;
+        obj["Card Info"]["id"]=id;
+        obj["Card Info"]["expireDate"]=expireDate;
+        obj["Card Info"]["ccv"]=ccv;
     }
     void SetUserInfo(const string &name, const string &address) override{
         usr.name=name;
         usr.address=address;
+        obj[""]["name"]=name;
+        obj[""]["address"]=address;
     }
+
     bool MakePayment(double d)override{
-        return StripePaymentAPI::WithDrawMoney(usr, card, d);
+        ostringstream oss;
+        oss<<obj;
+        string JsonQuery=oss.str();
+        return StripePaymentAPI::WithDrawMoney(JsonQuery);
     }
 
 };
